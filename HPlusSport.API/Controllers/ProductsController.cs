@@ -16,11 +16,13 @@ namespace HPlusSport.API.Controllers
             _context = context;
             _context.Database.EnsureCreated();
         }
+
         [HttpGet]
         public async Task<ActionResult> GetAllProducts()
         {
             return Ok(await _context.Products.ToListAsync());
         }
+
         [HttpGet("{id}")]
         public async Task<ActionResult> GetProduct(int id)
         {
@@ -28,6 +30,15 @@ namespace HPlusSport.API.Controllers
             if(product == null)
                 return NotFound();
             return Ok(product);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<Product>> PostProduct(Product product)
+        {
+            _context.Products.Add(product);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("GetProduct", new { id = product.Id }, product);
         }
     }
 }
