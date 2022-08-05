@@ -1,28 +1,27 @@
 ﻿using HPlusSport.API.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace HPlusSport.API.Controllers
 {
-    [ApiVersion("1.0")]
+    [ApiVersion("2.0")]
     //[Route("api/[controller]")]
     [Route("v{v:apiVersion}/products")]
     [ApiController]
-    public class ProductsController : ControllerBase
+    public class ProductsV2Controller : ControllerBase
     {
         private readonly ShopContext _context;
 
-        public ProductsController(ShopContext context)
+        public ProductsV2Controller(ShopContext context)
         {
             _context = context;
             _context.Database.EnsureCreated();
         }
 
-        [HttpGet] 
-        public async Task<ActionResult> GetAllProducts([FromQuery]ProductQueryParameters queryParameters)
+        [HttpGet]
+        public async Task<ActionResult> GetAllProducts([FromQuery] ProductQueryParameters queryParameters)
         {
-            IQueryable<Product> products = _context.Products;
+            IQueryable<Product> products = _context.Products.Where(p => p.IsAvailable);
 
             //https://localhost:7018/api/products?minprice=20&maxprice=50
             if (queryParameters.MinPrice != null)
@@ -43,7 +42,7 @@ namespace HPlusSport.API.Controllers
             //https://localhost:7018/api/products?name=jeans
             if (!string.IsNullOrEmpty(queryParameters.Name))
             {
-                products = products.Where(p => p.Name.Contains(queryParameters.Name,StringComparison.OrdinalIgnoreCase));
+                products = products.Where(p => p.Name.Contains(queryParameters.Name, StringComparison.OrdinalIgnoreCase));
             }
 
             //https://localhost:7018/api/products?size=20&page=2
@@ -58,7 +57,7 @@ namespace HPlusSport.API.Controllers
         public async Task<ActionResult> GetProduct(int id)
         {
             var product = await _context.Products.FindAsync(id);
-            if(product == null)
+            if (product == null)
                 return NotFound();
 
             return Ok(product);
@@ -131,7 +130,7 @@ namespace HPlusSport.API.Controllers
 
             _context.Products.RemoveRange(products);
             await _context.SaveChangesAsync();
-            
+
             return Ok(products);
         }
     }
