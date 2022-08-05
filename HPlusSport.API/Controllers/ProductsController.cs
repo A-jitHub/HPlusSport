@@ -18,9 +18,15 @@ namespace HPlusSport.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult> GetAllProducts()
+        public async Task<ActionResult> GetAllProducts([FromQuery]QueryParameters queryParameters)
         {
-            return Ok(await _context.Products.ToListAsync());
+            IQueryable<Product> products = _context.Products;
+            
+            products = products
+                .Skip(queryParameters.Size * (queryParameters.Page - 1))
+                .Take(queryParameters.Size);
+
+            return Ok(await products.ToListAsync());
         }
 
         [HttpGet("{id}")]
@@ -29,6 +35,7 @@ namespace HPlusSport.API.Controllers
             var product = await _context.Products.FindAsync(id);
             if(product == null)
                 return NotFound();
+
             return Ok(product);
         }
 
@@ -48,6 +55,7 @@ namespace HPlusSport.API.Controllers
             {
                 return BadRequest();
             }
+
             _context.Entry(product).State = EntityState.Modified;
             try
             {
