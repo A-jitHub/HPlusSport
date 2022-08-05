@@ -17,11 +17,23 @@ namespace HPlusSport.API.Controllers
             _context.Database.EnsureCreated();
         }
 
-        [HttpGet]
-        public async Task<ActionResult> GetAllProducts([FromQuery]QueryParameters queryParameters)
+        [HttpGet] 
+        public async Task<ActionResult> GetAllProducts([FromQuery]ProductQueryParameters queryParameters)
         {
             IQueryable<Product> products = _context.Products;
-            
+
+            //https://localhost:7018/api/products?minprice=20&maxprice=50
+            if (queryParameters.MinPrice != null)
+            {
+                products = products.Where(p => p.Price >= queryParameters.MinPrice);
+            }
+
+            if (queryParameters.MaxPrice != null)
+            {
+                products = products.Where(p => p.Price <= queryParameters.MaxPrice);
+            }
+
+            //https://localhost:7018/api/products?size=20&page=2
             products = products
                 .Skip(queryParameters.Size * (queryParameters.Page - 1))
                 .Take(queryParameters.Size);
