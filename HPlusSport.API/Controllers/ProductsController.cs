@@ -33,6 +33,17 @@ namespace HPlusSport.API.Controllers
                 products = products.Where(p => p.Price <= queryParameters.MaxPrice);
             }
 
+            if (!string.IsNullOrEmpty(queryParameters.Sku))
+            {
+                products = products.Where(p => p.Sku == queryParameters.Sku);
+            }
+
+            //https://localhost:7018/api/products?name=jeans
+            if (!string.IsNullOrEmpty(queryParameters.Name))
+            {
+                products = products.Where(p => p.Name.Contains(queryParameters.Name,StringComparison.OrdinalIgnoreCase));
+            }
+
             //https://localhost:7018/api/products?size=20&page=2
             products = products
                 .Skip(queryParameters.Size * (queryParameters.Page - 1))
