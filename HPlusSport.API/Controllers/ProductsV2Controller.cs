@@ -6,7 +6,8 @@ namespace HPlusSport.API.Controllers
 {
     [ApiVersion("2.0")]
     //[Route("api/[controller]")]
-    [Route("v{v:apiVersion}/products")]
+    //[Route("v{v:apiVersion}/products")] //URL versioning
+    [Route("products")] //Http Header versioning
     [ApiController]
     public class ProductsV2Controller : ControllerBase
     {
