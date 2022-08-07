@@ -1,7 +1,8 @@
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using HPlusSport.Web.Data;
 using HPlusSport.Web.Areas.Identity.Data;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("HPlusSportWebContextConnection");
@@ -15,6 +16,21 @@ builder.Services.AddDefaultIdentity<HPlusSportWebUser>(options => options.SignIn
 // Add services to the container.
 builder.Services.AddRazorPages();
 
+builder.Services.AddControllers();
+builder.Services.AddAuthorization();
+builder.Services.AddAuthentication()
+    .AddJwtBearer(options =>
+    {
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("This is My Secret Key for access token"));
+        options.SaveToken = true;
+        options.RequireHttpsMetadata = false;
+        options.TokenValidationParameters = new TokenValidationParameters()
+        {
+            ValidateAudience = false,
+            ValidateIssuer = false,
+            IssuerSigningKey = key
+        };
+    });
 
 var app = builder.Build();
 
@@ -35,5 +51,7 @@ app.UseAuthentication();;
 app.UseAuthorization();
 
 app.MapRazorPages();
+
+app.MapControllers();
 
 app.Run();
